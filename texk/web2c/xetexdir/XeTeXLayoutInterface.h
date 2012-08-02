@@ -60,12 +60,8 @@ void cacheGlyphBBox(UInt16 fontID, UInt16 glyphID, const GlyphBBox* bbox);
 
 void terminatefontmanager();
 
-#ifdef XETEX_MAC
-XeTeXFont createFont(ATSFontRef atsFont, Fixed pointSize);
-#else
 // appropriate functions for other platforms
 XeTeXFont createFont(PlatformFontRef fontRef, Fixed pointSize);
-#endif
 XeTeXFont createFontFromFile(const char* filename, int index, Fixed pointSize);
 
 void setFontLayoutDir(XeTeXFont font, int vertical);

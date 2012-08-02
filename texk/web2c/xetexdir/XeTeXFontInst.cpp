@@ -47,10 +47,6 @@ authorization from the copyright holders.
 #include "XeTeXFontInst.h"
 #include "XeTeXLayoutInterface.h"
 
-#ifdef XETEX_MAC
-#include <Carbon/Carbon.h>
-#endif
-
 #include "XeTeX_ext.h"
 
 #include "sfnt.h"

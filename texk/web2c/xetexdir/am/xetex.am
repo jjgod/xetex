@@ -29,7 +29,7 @@ xetex_dependencies += $(ICU_DEPEND) $(TECKIT_DEPEND)
 if XETEX_MACOSX
 
 xetex_cppflags += -DXETEX_MAC
-xetex_LDFLAGS = -framework Carbon -framework Cocoa -framework QuickTime
+xetex_LDFLAGS = -framework Carbon -framework Cocoa
 
 ## Extra library for the Objective C++ file xetexdir/XeTeXFontMgr_Mac.mm.
 libxetex += libxetexmm.a

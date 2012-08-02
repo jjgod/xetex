@@ -41,10 +41,10 @@ authorization from the copyright holders.
 #include "XeTeXFontInst_Mac.h"
 #include "XeTeX_ext.h"
 
-XeTeXFontInst_Mac::XeTeXFontInst_Mac(ATSFontRef atsFont, float pointSize, LEErrorCode &status)
+XeTeXFontInst_Mac::XeTeXFontInst_Mac(CTFontDescriptorRef descriptor, float pointSize, LEErrorCode &status)
     : XeTeXFontInst(pointSize, status)
-    , fFontRef(atsFont)
-    , fStyle(0)
+    , fDescriptor(descriptor)
+    , fFontRef(0)
 {
     if (LE_FAILURE(status)) {
         return;
@@ -55,13 +55,13 @@ XeTeXFontInst_Mac::XeTeXFontInst_Mac(ATSFontRef atsFont, float pointSize, LEErro
 
 XeTeXFontInst_Mac::~XeTeXFontInst_Mac()
 {
-	if (fStyle != 0)
-		ATSUDisposeStyle(fStyle);
+	if (fFontRef != 0)
+		CFRelease(fFontRef);
 }
 
 void XeTeXFontInst_Mac::initialize(LEErrorCode &status)
 {
-    if (fFontRef == 0) {
+    if (fDescriptor == 0) {
         status = LE_FONT_FILE_NOT_FOUND_ERROR;
         return;
     }
@@ -69,20 +69,12 @@ void XeTeXFontInst_Mac::initialize(LEErrorCode &status)
 	XeTeXFontInst::initialize(status);
 
 	if (status != LE_NO_ERROR)
-		fFontRef = 0;
+		fDescriptor = 0;
 
-	if (ATSUCreateStyle(&fStyle) == noErr) {
-		ATSUFontID	font = FMGetFontFromATSFontRef(fFontRef);
-		Fixed		size = X2Fix(fPointSize * 72.0 / 72.27); /* convert TeX to Quartz points */
-		ATSStyleRenderingOptions	options = kATSStyleNoHinting;
-		ATSUAttributeTag		tags[3] = { kATSUFontTag, kATSUSizeTag, kATSUStyleRenderingOptionsTag };
-		ByteCount				valueSizes[3] = { sizeof(ATSUFontID), sizeof(Fixed), sizeof(ATSStyleRenderingOptions) };
-		ATSUAttributeValuePtr	values[3] = { &font, &size, &options };
-		ATSUSetAttributes(fStyle, 3, tags, valueSizes, values);
-	}
-	else {
+    fFontRef = CTFontCreateWithFontDescriptor(fDescriptor, fPointSize * 72.0 / 72.27, NULL);
+	if (!fFontRef) {
 		status = LE_FONT_FILE_NOT_FOUND_ERROR;
-		fFontRef = 0;
+		fDescriptor = 0;
 	}
 	
     return;
@@ -90,27 +82,40 @@ void XeTeXFontInst_Mac::initialize(LEErrorCode &status)
 
 const void *XeTeXFontInst_Mac::readTable(LETag tag, le_uint32 *length) const
 {
-	OSStatus status = ATSFontGetTable(fFontRef, tag, 0, 0, 0, (ByteCount*)length);
-	if (status != noErr) {
+    CFDataRef tableData = CTFontCopyTable(fFontRef, tag, 0);
+	if (!tableData) {
 		*length = 0;
 		return NULL;
 	}
-	void*	table = LE_NEW_ARRAY(char, *length);
-	if (table != NULL) {
-		status = ATSFontGetTable(fFontRef, tag, 0, *length, table, (ByteCount*)length);
-		if (status != noErr) {
-			*length = 0;
-			LE_DELETE_ARRAY(table);
-			return NULL;
-		}
-	}
+    *length = CFDataGetLength(tableData);
+	UInt8* table = LE_NEW_ARRAY(UInt8, *length);
+	if (table != NULL)
+        CFDataGetBytes(tableData, CFRangeMake(0, *length), table);
 
     return table;
 }
 
 void XeTeXFontInst_Mac::getGlyphBounds(LEGlyphID gid, GlyphBBox* bbox)
 {
-	GetGlyphBBox_AAT(fStyle, gid, bbox);
+    bbox->xMin = 65536.0;
+    bbox->yMin = 65536.0;
+    bbox->xMax = -65536.0;
+    bbox->yMax = -65536.0;
+
+    CGRect rect = CTFontGetBoundingRectsForGlyphs(fFontRef,
+        0, /* Use default orientation for now, handle vertical later */
+        (const CGGlyph *) &gid, NULL, 1);
+
+    if (CGRectIsNull(rect))
+        bbox->xMin = bbox->yMin = bbox->xMax = bbox->yMax = 0;
+    else {
+        // convert PS to TeX points and flip y-axis
+        // TODO: do we need to flip for bounding rect returned by Core Text?
+        bbox->yMin = -(rect.origin.y + rect.size.height) * 72.27 / 72.0;
+        bbox->yMax = -(rect.origin.y) * 72.27 / 72.0;
+        bbox->xMin = rect.origin.x * 72.27 / 72.0;
+        bbox->xMax = (rect.origin.x + rect.size.width) * 72.27 / 72.0;
+    }
 }
 
 LEGlyphID
@@ -119,7 +124,7 @@ XeTeXFontInst_Mac::mapGlyphToIndex(const char* glyphName) const
 	LEGlyphID rval = XeTeXFontInst::mapGlyphToIndex(glyphName);
 	if (rval)
 		return rval;
-	return GetGlyphIDFromCGFont(fFontRef, glyphName);
+	return GetGlyphIDFromCTFont(fFontRef, glyphName);
 }
 
 const char*
@@ -128,5 +133,5 @@ XeTeXFontInst_Mac::getGlyphName(LEGlyphID gid, int& nameLen)
 	const char* rval = XeTeXFontInst::getGlyphName(gid, nameLen);
 	if (rval)
 		return rval;
-	return GetGlyphNameFromCGFont(fFontRef, gid, &nameLen);
+	return GetGlyphNameFromCTFont(fFontRef, gid, &nameLen);
 }

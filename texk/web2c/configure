@@ -17470,7 +17470,7 @@ else
 int
 main ()
 {
-ATSUStyle style
+CTFontRef font
   ;
   return 0;
 }

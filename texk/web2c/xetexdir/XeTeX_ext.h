@@ -306,24 +306,10 @@ typedef void* ATSUStyle; /* dummy declaration just so the stubs can compile */
 	void atsugetfontmetrics(ATSUStyle style, integer* ascent, integer* descent, integer* xheight, integer* capheight, integer* slant);
 
 #ifdef XETEX_MAC
-/* functions in XeTeX_mac.c */
-	void* loadAATfont(ATSFontRef fontRef, integer scaled_size, const char* cp1);
-	void DoAtsuiLayout(void* node, int justify);
-	void GetGlyphBBox_AAT(ATSUStyle style, UInt16 gid, GlyphBBox* bbox);
-	float GetGlyphWidth_AAT(ATSUStyle style, UInt16 gid);
-	void GetGlyphHeightDepth_AAT(ATSUStyle style, UInt16 gid, float* ht, float* dp);
-	void GetGlyphSidebearings_AAT(ATSUStyle style, UInt16 gid, float* lsb, float* rsb);
-	int MapCharToGlyph_AAT(ATSUStyle style, UInt32 ch);
-	int MapGlyphToIndex_AAT(ATSUStyle style, const char* glyphName);
-	int GetGlyphIDFromCGFont(ATSFontRef atsFontRef, const char* glyphName);
-	float GetGlyphItalCorr_AAT(ATSUStyle style, UInt16 gid);
-	char* GetGlyphName_AAT(ATSUStyle style, UInt16 gid, int* len);
-	char* GetGlyphNameFromCGFont(ATSFontRef atsFontRef, UInt16 gid, int* len);
-	int GetFontCharRange_AAT(ATSUStyle style, int reqFirst);
-	ATSUFontVariationAxis find_axis_by_name(ATSUFontID fontID, const char* name, int nameLength);
-	ATSUFontFeatureType find_feature_by_name(ATSUFontID fontID, const char* name, int nameLength);
-	ATSUFontFeatureSelector find_selector_by_name(ATSUFontID fontID, ATSUFontFeatureType featureType, const char* name, int nameLength);
+    int GetGlyphIDFromCTFont(CTFontRef ctFontRef, const char* glyphName);
+    char* GetGlyphNameFromCTFont(CTFontRef ctFontRef, UInt16 gid, int* len);
 #endif
+
 #ifdef __cplusplus
 };
 #endif

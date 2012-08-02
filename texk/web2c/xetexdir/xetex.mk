@@ -21,7 +21,7 @@ xetex = @XETEX@ xetex
 
 @XETEX_MACOSX@ XETEX_DEFINES = -DXETEX_MAC
 
-@XETEX_MACOSX@ EXTRALIBS = -framework Carbon -framework Cocoa -framework QuickTime
+@XETEX_MACOSX@ EXTRALIBS = -framework Carbon -framework Cocoa
 
 @XETEX_MACOSX@ EXTRADEPS = 
 
