@@ -1020,7 +1020,7 @@ loadOTfont(PlatformFontRef fontRef, XeTeXFont font, Fixed scaled_size, const cha
 	}
 	
 	if (embolden != 0.0)
-		embolden = embolden * Fix2X(scaled_size) / 100.0;
+		embolden = embolden * Fix2D(scaled_size) / 100.0;
 
 	if (letterspace != 0.0)
 		loadedfontletterspace = (letterspace / 100.0) * scaled_size;
@@ -1186,7 +1186,7 @@ loadGraphiteFont(PlatformFontRef fontRef, XeTeXFont font, Fixed scaled_size, con
 	}
 	
 	if (embolden != 0.0)
-		embolden = embolden * Fix2X(scaled_size) / 100.0;
+		embolden = embolden * Fix2D(scaled_size) / 100.0;
 
 	if (letterspace != 0.0)
 		loadedfontletterspace = (letterspace / 100.0) * scaled_size;
@@ -1308,7 +1308,7 @@ findnativefont(unsigned char* uname, integer scaled_size)
 			if (scaled_size < 0) {
 				font = createFontFromFile(path, index, 655360L);
 				if (font != NULL) {
-					Fixed dsize = X2Fix(getDesignSize(font));
+					Fixed dsize = D2Fix(getDesignSize(font));
 					if (scaled_size == -1000)
 						scaled_size = dsize;
 					else
@@ -1318,7 +1318,7 @@ findnativefont(unsigned char* uname, integer scaled_size)
 			}
 			font = createFontFromFile(path, index, scaled_size);
 			if (font != NULL) {
-				loadedfontdesignsize = X2Fix(getDesignSize(font));
+				loadedfontdesignsize = D2Fix(getDesignSize(font));
 #if XETEX_GRAPHITE
 				if (varString && strncmp(varString, "/GR", 3) == 0) {
 					rval = loadGraphiteFont(0, font, scaled_size, featString, nameString);
@@ -1341,7 +1341,7 @@ findnativefont(unsigned char* uname, integer scaled_size)
 		}
 	}
 	else {
-		fontRef = findFontByName(nameString, varString, Fix2X(scaled_size));
+		fontRef = findFontByName(nameString, varString, Fix2D(scaled_size));
 	
 		if (fontRef != 0) {
 			/* update nameoffile to the full name of the font, for error messages during font loading */
@@ -1359,7 +1359,7 @@ findnativefont(unsigned char* uname, integer scaled_size)
 			if (scaled_size < 0) {
 				font = createFont(fontRef, scaled_size);
 				if (font != NULL) {
-					Fixed dsize = X2Fix(getDesignSize(font));
+					Fixed dsize = D2Fix(getDesignSize(font));
 					if (scaled_size == -1000)
 						scaled_size = dsize;
 					else
@@ -1429,16 +1429,16 @@ otgetfontmetrics(void* pEngine, scaled* ascent, scaled* descent, scaled* xheight
 	int		glyphID;
 
 	getAscentAndDescent(engine, &a, &d);
-	*ascent = X2Fix(a);
-	*descent = X2Fix(d);
+	*ascent = D2Fix(a);
+	*descent = D2Fix(d);
 
-	*slant = X2Fix(Fix2X(getSlant(getFont(engine))) * getExtendFactor(engine)
+	*slant = D2Fix(Fix2D(getSlant(getFont(engine))) * getExtendFactor(engine)
 					+ getSlantFactor(engine));
 
 	glyphID = mapCharToGlyph(engine, 'x');
 	if (glyphID != 0) {
 		getGlyphHeightDepth(engine, glyphID, &a, &d);
-		*xheight = X2Fix(a);
+		*xheight = D2Fix(a);
 	}
 	else
 		*xheight = *ascent / 2; /* arbitrary figure if there's no 'x' in the font */
@@ -1446,7 +1446,7 @@ otgetfontmetrics(void* pEngine, scaled* ascent, scaled* descent, scaled* xheight
 	glyphID = mapCharToGlyph(engine, 'X');
 	if (glyphID != 0) {
 		getGlyphHeightDepth(engine, glyphID, &a, &d);
-		*capheight = X2Fix(a);
+		*capheight = D2Fix(a);
 	}
 	else
 		*capheight = *ascent; /* arbitrary figure if there's no 'X' in the font */
@@ -1723,7 +1723,7 @@ makefontdef(integer f)
 		slant = getSlantFactor(engine);
 		embolden = getEmboldenFactor(engine);
 
-		size = X2Fix(getPointSize(engine));
+		size = D2Fix(getPointSize(engine));
 	}
 	else {
 		fprintf(stderr, "\n! Internal error: bad native font flag\n");
@@ -1803,17 +1803,17 @@ makefontdef(integer f)
 	}
 	
 	if (flags & XDV_FLAG_EXTEND) {
-		Fixed	f = X2Fix(extend);
+		Fixed	f = D2Fix(extend);
 		*(UInt32*)(cp) = SWAP32(f);
 		cp += 4;
 	}
 	if (flags & XDV_FLAG_SLANT) {
-		Fixed	f = X2Fix(slant);
+		Fixed	f = D2Fix(slant);
 		*(UInt32*)(cp) = SWAP32(f);
 		cp += 4;
 	}
 	if (flags & XDV_FLAG_EMBOLDEN) {
-		Fixed	f = X2Fix(embolden);
+		Fixed	f = D2Fix(embolden);
 		*(UInt32*)(cp) = SWAP32(f);
 		cp += 4;
 	}
@@ -1888,8 +1888,8 @@ getnativecharheightdepth(integer font, integer ch, scaled* height, scaled* depth
 		exit(3);
 	}
 
-	*height = X2Fix(ht);
-	*depth = X2Fix(dp);
+	*height = D2Fix(ht);
+	*depth = D2Fix(dp);
 	
 	/* snap to "known" zones for baseline, x-height, cap-height if within 4% of em-size */
 	fuzz = QUAD(font) / 25;
@@ -1930,8 +1930,8 @@ getnativecharsidebearings(integer font, integer ch, scaled* lsb, scaled* rsb)
 		exit(3);
 	}
 
-	*lsb = X2Fix(l);
-	*rsb = X2Fix(r);
+	*lsb = D2Fix(l);
+	*rsb = D2Fix(r);
 }
 
 scaled
@@ -1951,7 +1951,7 @@ getglyphbounds(integer font, integer edge, integer gid)
 		fprintf(stderr, "\n! Internal error: bad native font flag\n");
 		exit(3);
 	}
-	return X2Fix((edge <= 2) ? a : b);
+	return D2Fix((edge <= 2) ? a : b);
 }
 
 scaled
@@ -1972,7 +1972,7 @@ getnativecharwd(integer f, integer c)
 	if (fontarea[f] == OTGR_FONT_FLAG) {
 		XeTeXLayoutEngine	engine = (XeTeXLayoutEngine)fontlayoutengine[f];
 		int	gid = mapCharToGlyph(engine, c);
-		wd = X2Fix(getGlyphWidthFromEngine(engine, gid));
+		wd = D2Fix(getGlyphWidthFromEngine(engine, gid));
 	}
 	else {
 		fprintf(stderr, "\n! Internal error: bad native font flag\n");
@@ -2084,8 +2084,8 @@ measure_native_node(void* pNode, int use_glyph_metrics)
 						for (i = 0; i < nGlyphs; ++i) {
 							if (glyphs[i] < 0xfffe) {
 								glyphIDs[realGlyphCount] = glyphs[i];
-								locations[realGlyphCount].x = X2Fix(positions[2*i] + x);
-								locations[realGlyphCount].y = X2Fix(positions[2*i+1] + y);
+								locations[realGlyphCount].x = D2Fix(positions[2*i] + x);
+								locations[realGlyphCount].y = D2Fix(positions[2*i+1] + y);
 								++realGlyphCount;
 							}
 						}
@@ -2095,7 +2095,7 @@ measure_native_node(void* pNode, int use_glyph_metrics)
 					wid = x;
 				}
 	
-				node_width(node) = X2Fix(wid);
+				node_width(node) = D2Fix(wid);
 				native_glyph_count(node) = realGlyphCount;
 				native_glyph_info_ptr(node) = glyph_info;
 			}
@@ -2108,7 +2108,7 @@ measure_native_node(void* pNode, int use_glyph_metrics)
    see http://sourceforge.net/tracker/index.php?func=detail&aid=1951292&group_id=194926&atid=951385 */
 #if 0
 				getGlyphPosition(engine, nGlyphs, &x, &y, &status);
-				node_width(node) = X2Fix(x);
+				node_width(node) = D2Fix(x);
 #endif
 
 				if (nGlyphs >= maxGlyphs) {
@@ -2138,14 +2138,14 @@ measure_native_node(void* pNode, int use_glyph_metrics)
 							if (rhs > maxRhs)
 								maxRhs = rhs;
 							glyphIDs[realGlyphCount] = glyphs[i];
-							locations[realGlyphCount].x = X2Fix(positions[2*i]);
-							locations[realGlyphCount].y = X2Fix(positions[2*i+1]);
+							locations[realGlyphCount].x = D2Fix(positions[2*i]);
+							locations[realGlyphCount].y = D2Fix(positions[2*i+1]);
 							++realGlyphCount;
 						}
 					}
 				}
 
-				node_width(node) = X2Fix(maxRhs);
+				node_width(node) = D2Fix(maxRhs);
 				native_glyph_count(node) = realGlyphCount;
 				native_glyph_info_ptr(node) = glyph_info;
 			}
@@ -2167,12 +2167,12 @@ measure_native_node(void* pNode, int use_glyph_metrics)
 				for (i = 0; i < realGlyphCount; ++i) {
 					float	x, y;
 					getGraphiteGlyphInfo(engine, i, &(glyphIDs[i]), &x, &y);
-					locations[i].x = X2Fix(x);
-					locations[i].y = X2Fix(y);
+					locations[i].x = D2Fix(x);
+					locations[i].y = D2Fix(y);
 				}
 			}
 						
-			node_width(node) = X2Fix(graphiteSegmentWidth(engine));
+			node_width(node) = D2Fix(graphiteSegmentWidth(engine));
 #else
 			node_width(node) = 0;
 #endif
@@ -2218,7 +2218,7 @@ measure_native_node(void* pNode, int use_glyph_metrics)
 		int	i;
 		for (i = 0; i < native_glyph_count(node); ++i) {
 			float	ht, dp;
-			float	y = Fix2X(-locations[i].y);	/* NB negative is upwards in locations[].y! */
+			float	y = Fix2D(-locations[i].y);	/* NB negative is upwards in locations[].y! */
 
 			GlyphBBox	bbox;
 			if (getCachedGlyphBBox(f, glyphIDs[i], &bbox) == 0) {
@@ -2236,8 +2236,8 @@ measure_native_node(void* pNode, int use_glyph_metrics)
 			if (y - dp < yMin)
 				yMin = y - dp;
 		}
-		node_height(node) = X2Fix(yMax);
-		node_depth(node) = -X2Fix(yMin);
+		node_height(node) = D2Fix(yMax);
+		node_depth(node) = -D2Fix(yMin);
 	}
 }
 
@@ -2252,7 +2252,7 @@ get_native_ital_corr(void* pNode)
 		UInt16*		glyphIDs = (UInt16*)(locations + n);
 
 		if (fontarea[f] == OTGR_FONT_FLAG)
-			return X2Fix(getGlyphItalCorr((XeTeXLayoutEngine)(fontlayoutengine[f]), glyphIDs[n-1]))
+			return D2Fix(getGlyphItalCorr((XeTeXLayoutEngine)(fontlayoutengine[f]), glyphIDs[n-1]))
 					+ fontletterspace[f];
 	}
 
@@ -2268,7 +2268,7 @@ get_native_glyph_ital_corr(void* pNode)
 	unsigned	f = native_font(node);
 
 	if (fontarea[f] == OTGR_FONT_FLAG)
-		return X2Fix(getGlyphItalCorr((XeTeXLayoutEngine)(fontlayoutengine[f]), gid));
+		return D2Fix(getGlyphItalCorr((XeTeXLayoutEngine)(fontlayoutengine[f]), gid));
 
 	return 0;	/* can't actually happen */
 }
@@ -2286,7 +2286,7 @@ measure_native_glyph(void* pNode, int use_glyph_metrics)
 	if (fontarea[f] == OTGR_FONT_FLAG) {
 		XeTeXLayoutEngine	engine = (XeTeXLayoutEngine)fontlayoutengine[f];
 		XeTeXFont		fontInst = getFont(engine);
-		node_width(node) = X2Fix(getGlyphWidth(fontInst, gid));
+		node_width(node) = D2Fix(getGlyphWidth(fontInst, gid));
 		if (use_glyph_metrics)
 			getGlyphHeightDepth(engine, gid, &ht, &dp);
 	}
@@ -2296,8 +2296,8 @@ measure_native_glyph(void* pNode, int use_glyph_metrics)
 	}
 
 	if (use_glyph_metrics) {
-		node_height(node) = X2Fix(ht);
-		node_depth(node) = X2Fix(dp);
+		node_height(node) = D2Fix(ht);
+		node_depth(node) = D2Fix(dp);
 	}
 	else {
 		node_height(node) = heightbase[f];
@@ -2341,19 +2341,17 @@ getfontcharrange(integer font, int first)
 	}
 }
 
-#ifndef XETEX_MAC
-Fixed X2Fix(double d)
+Fixed D2Fix(double d)
 {
 	Fixed rval = (int)(d * 65536.0 + 0.5);
 	return rval;
 }
 
-double Fix2X(Fixed f)
+double Fix2D(Fixed f)
 {
 	double rval = f / 65536.0;
 	return rval;
 }
-#endif
 
 /* these are here, not XeTeX_mac.c, because we need stubs on other platforms */
 void

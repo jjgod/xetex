@@ -137,7 +137,7 @@ void XeTeXFontInst::initialize(LEErrorCode &status)
     postTable = (const POSTTable *) readFontTable(postTag);
 
     if (postTable != NULL) {
-		fItalicAngle = Fix2X(SWAPL(postTable->italicAngle));
+		fItalicAngle = Fix2D(SWAPL(postTable->italicAngle));
 		deleteTable(postTable);
     }
 

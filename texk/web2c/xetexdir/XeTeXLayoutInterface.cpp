@@ -118,13 +118,13 @@ XeTeXFont createFont(PlatformFontRef fontRef, Fixed pointSize)
 {
 	LEErrorCode status = LE_NO_ERROR;
 #ifdef XETEX_MAC
-	XeTeXFontInst* font = new XeTeXFontInst_Mac(fontRef, Fix2X(pointSize), status);
+	XeTeXFontInst* font = new XeTeXFontInst_Mac(fontRef, Fix2D(pointSize), status);
 #else
 	FcChar8*	pathname = 0;
 	FcPatternGetString(fontRef, FC_FILE, 0, &pathname);
 	int			index;
 	FcPatternGetInteger(fontRef, FC_INDEX, 0, &index);
-	XeTeXFontInst* font = new XeTeXFontInst_FT2((const char*)pathname, index, Fix2X(pointSize), status);
+	XeTeXFontInst* font = new XeTeXFontInst_FT2((const char*)pathname, index, Fix2D(pointSize), status);
 #endif
 	if (LE_FAILURE(status)) {
 		delete font;
@@ -136,7 +136,7 @@ XeTeXFont createFont(PlatformFontRef fontRef, Fixed pointSize)
 XeTeXFont createFontFromFile(const char* filename, int index, Fixed pointSize)
 {
 	LEErrorCode status = LE_NO_ERROR;
-	XeTeXFontInst* font = new XeTeXFontInst_FT2(filename, index, Fix2X(pointSize), status);
+	XeTeXFontInst* font = new XeTeXFontInst_FT2(filename, index, Fix2D(pointSize), status);
 	if (LE_FAILURE(status)) {
 		delete font;
 		return NULL;
@@ -204,7 +204,7 @@ void* getFontTablePtr(XeTeXFont font, UInt32 tableTag)
 Fixed getSlant(XeTeXFont font)
 {
 	float italAngle = ((XeTeXFontInst*)font)->getItalicAngle();
-	return X2Fix(tan(-italAngle * M_PI / 180.0));
+	return D2Fix(tan(-italAngle * M_PI / 180.0));
 }
 
 static const ScriptListTable*

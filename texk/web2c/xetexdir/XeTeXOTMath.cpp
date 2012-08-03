@@ -85,7 +85,7 @@ getotmathconstant(int f, int n)
 		rval = getMathConstant(font, (mathConstantIndex)n);
 		/* scale according to font size, except the ones that are percentages */
 		if (n > scriptScriptPercentScaleDown && n < radicalDegreeBottomRaisePercent)
-			rval = X2Fix(rval * Fix2X(fontsize[f]) / font->getUnitsPerEM());
+			rval = D2Fix(rval * Fix2D(fontsize[f]) / font->getUnitsPerEM());
 	}
 	return rval;
 }
@@ -149,7 +149,7 @@ getnativemathsyparam(int f, int n)
 				rval = getotmathconstant(f, (int)ot_index);
 		}
 	}
-//	fprintf(stderr, " math_sy(%d, %d) returns %.3f\n", f, n, Fix2X(rval));
+//	fprintf(stderr, " math_sy(%d, %d) returns %.3f\n", f, n, Fix2D(rval));
 	
 	return rval;
 }
@@ -193,7 +193,7 @@ getnativemathexparam(int f, int n)
 				rval = getotmathconstant(f, (int)ot_index);
 		}
 	}
-//	fprintf(stderr, " math_ex(%d, %d) returns %.3f\n", f, n, Fix2X(rval));
+//	fprintf(stderr, " math_ex(%d, %d) returns %.3f\n", f, n, Fix2D(rval));
 	
 	return rval;
 }
@@ -229,8 +229,8 @@ getotmathvariant(int f, int g, int v, integer* adv, int horiz)
 															+ SWAPW(variants->vertGlyphConstruction[index]));
 			if (v < SWAPW(construction->variantCount)) {
 				rval = SWAPW(construction->mathGlyphVariantRecord[v].variantGlyph);
-				*adv = X2Fix(SWAPW(construction->mathGlyphVariantRecord[v].advanceMeasurement)
-								* Fix2X(fontsize[f]) / font->getUnitsPerEM());
+				*adv = D2Fix(SWAPW(construction->mathGlyphVariantRecord[v].advanceMeasurement)
+								* Fix2D(fontsize[f]) / font->getUnitsPerEM());
 			}
 		}
 	}
@@ -304,7 +304,7 @@ getotmathitalcorr(int f, int g)
 
 		le_int32	index = coverage->getGlyphCoverage(g);
 		if (index >= 0 && index < SWAPW(italCorrInfo->italicsCorrectionCount))
-			rval = X2Fix(SWAPW(italCorrInfo->italicsCorrection[index].value) * Fix2X(fontsize[f]) / font->getUnitsPerEM());
+			rval = D2Fix(SWAPW(italCorrInfo->italicsCorrection[index].value) * Fix2D(fontsize[f]) / font->getUnitsPerEM());
 	}
 	
 	return rval;
@@ -340,7 +340,7 @@ getotmathaccentpos(int f, int g)
 		le_int32	index = coverage->getGlyphCoverage(g);
 		if (index >= 0 && index < SWAPW(accentAttachment->topAccentAttachmentCount)) {
 			rval = (le_int16)SWAPW(accentAttachment->topAccentAttachment[index].value);
-			rval = X2Fix(rval * Fix2X(fontsize[f]) / font->getUnitsPerEM());
+			rval = D2Fix(rval * Fix2D(fontsize[f]) / font->getUnitsPerEM());
 		}
 	}
 	
@@ -364,7 +364,7 @@ otminconnectoroverlap(int f)
 			return rval;
 		const MathVariants* variants = (const MathVariants*)(table + offset);
 
-		rval = X2Fix(SWAPW(variants->minConnectorOverlap) * Fix2X(fontsize[f]) / font->getUnitsPerEM());
+		rval = D2Fix(SWAPW(variants->minConnectorOverlap) * Fix2D(fontsize[f]) / font->getUnitsPerEM());
 	}
 
 	return rval;
@@ -395,7 +395,7 @@ otpartstartconnector(int f, const GlyphAssembly* a, int i)
 	
 	if (fontarea[f] == OTGR_FONT_FLAG) {
 		XeTeXFontInst*	font = (XeTeXFontInst*)getFont((XeTeXLayoutEngine)fontlayoutengine[f]);
-		rval = X2Fix(SWAPW(a->partRecords[i].startConnectorLength) * Fix2X(fontsize[f]) / font->getUnitsPerEM());
+		rval = D2Fix(SWAPW(a->partRecords[i].startConnectorLength) * Fix2D(fontsize[f]) / font->getUnitsPerEM());
 	}
 	
 	return rval;
@@ -408,7 +408,7 @@ otpartendconnector(int f, const GlyphAssembly* a, int i)
 	
 	if (fontarea[f] == OTGR_FONT_FLAG) {
 		XeTeXFontInst*	font = (XeTeXFontInst*)getFont((XeTeXLayoutEngine)fontlayoutengine[f]);
-		rval = X2Fix(SWAPW(a->partRecords[i].endConnectorLength) * Fix2X(fontsize[f]) / font->getUnitsPerEM());
+		rval = D2Fix(SWAPW(a->partRecords[i].endConnectorLength) * Fix2D(fontsize[f]) / font->getUnitsPerEM());
 	}
 	
 	return rval;
@@ -421,7 +421,7 @@ otpartfulladvance(int f, const GlyphAssembly* a, int i)
 	
 	if (fontarea[f] == OTGR_FONT_FLAG) {
 		XeTeXFontInst*	font = (XeTeXFontInst*)getFont((XeTeXLayoutEngine)fontlayoutengine[f]);
-		rval = X2Fix(SWAPW(a->partRecords[i].fullAdvance) * Fix2X(fontsize[f]) / font->getUnitsPerEM());
+		rval = D2Fix(SWAPW(a->partRecords[i].fullAdvance) * Fix2D(fontsize[f]) / font->getUnitsPerEM());
 	}
 	
 	return rval;
