@@ -66,8 +66,6 @@ void XeTeXFontInst_Mac::initialize(LEErrorCode &status)
         return;
     }
 
-	XeTeXFontInst::initialize(status);
-
 	if (status != LE_NO_ERROR)
 		fDescriptor = 0;
 
@@ -76,12 +74,16 @@ void XeTeXFontInst_Mac::initialize(LEErrorCode &status)
 		status = LE_FONT_FILE_NOT_FOUND_ERROR;
 		fDescriptor = 0;
 	}
-	
-    return;
+
+    XeTeXFontInst::initialize(status);
 }
 
 const void *XeTeXFontInst_Mac::readTable(LETag tag, le_uint32 *length) const
 {
+    if (!fFontRef) {
+        *length = 0;
+        return NULL;
+    }
     CFDataRef tableData = CTFontCopyTable(fFontRef, tag, 0);
 	if (!tableData) {
 		*length = 0;

@@ -1357,7 +1357,7 @@ findnativefont(unsigned char* uname, integer scaled_size)
 			strcpy((char*)nameoffile + 1, fullName);
 
 			if (scaled_size < 0) {
-				font = createFont(fontRef, scaled_size);
+				font = createFont(fontRef, 655360);
 				if (font != NULL) {
 					Fixed dsize = D2Fix(getDesignSize(font));
 					if (scaled_size == -1000)
@@ -1367,7 +1367,7 @@ findnativefont(unsigned char* uname, integer scaled_size)
 					deleteFont(font);
 				}
 			}
-	
+
 			font = createFont(fontRef, scaled_size);
 			if (font != 0) {
 #ifdef XETEX_GRAPHITE
@@ -1377,13 +1377,8 @@ findnativefont(unsigned char* uname, integer scaled_size)
 						graphitewarning();
 				}
 #endif
-				if (rval == NULL) {
-#ifdef XETEX_MAC
-					if (getReqEngine() == 'I' || getReqEngine() == 'G' ||
-						getFontTablePtr(font, kGSUB) != NULL || getFontTablePtr(font, kGPOS) != NULL)
-#endif
-						rval = loadOTfont(fontRef, font, scaled_size, featString);
-				}
+				if (rval == NULL)
+                    rval = loadOTfont(fontRef, font, scaled_size, featString);
 				if (rval == NULL)
 					deleteFont(font);
 			}
