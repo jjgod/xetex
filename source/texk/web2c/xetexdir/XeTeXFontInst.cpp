@@ -46,6 +46,7 @@ authorization from the copyright holders.
 #include "XeTeX_ext.h"
 
 #include <string.h>
+#include FT_CID_H
 #include FT_GLYPH_H
 #include FT_ADVANCES_H
 
@@ -95,6 +96,10 @@ _get_glyph(hb_font_t*, void *font_data, hb_codepoint_t ch, hb_codepoint_t vs, hb
 
     if (*gid == 0)
         *gid = FT_Get_Char_Index (face, ch);
+
+    FT_UInt cid = 0;
+    if (FT_Get_CID_From_Glyph_Index (face, *gid, &cid) == 0)
+        *gid = cid;
 
     return *gid != 0;
 }
